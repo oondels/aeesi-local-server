@@ -13,3 +13,9 @@ app.listen(port, () => {
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.get("/user", (req, res) => {
+  res.json({
+    names: ["Hendrius", "Christopher", "Bruce"],
+  });
+});
