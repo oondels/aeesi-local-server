@@ -1,49 +1,35 @@
 <template>
-  <div>
-    <h1>Aeesi</h1>
-    <button @click="TesteNames">Click me</button>
-    <div class="names" v-for="(name, nameIndex) in names" :key="nameIndex">
-      {{ name }}
-    </div>
+  <div class="nav-bar">
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/about">About</router-link>
+    </nav>
+    <router-view />
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import ip from "./ip";
+import "./assets/main.css";
 
 export default {
   name: "App",
-  components: {},
-
-  data() {
-    return {
-      names: null,
-    };
-  },
-
-  methods: {
-    TesteNames() {
-      axios
-        .get(`${ip.apiBaseUrl}/user`)
-        .then((response) => {
-          this.names = response.data.names;
-        })
-        .catch((error) => {
-          console.error("Erro ao se comunicar com servidor: ", error);
-        });
-    },
-  },
 };
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+nav {
+  padding: 1rem;
+  background-color: #f5f5f5;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+  color: #42b983;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  color: black;
 }
 </style>
