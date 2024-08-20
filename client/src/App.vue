@@ -10,7 +10,7 @@
 
 <script>
 import axios from "axios";
-import ip from "../../ip";
+import ip from "./ip";
 
 export default {
   name: "App",
@@ -25,7 +25,7 @@ export default {
   methods: {
     TesteNames() {
       axios
-        .get(`${ip}/user`)
+        .get(`${ip.apiBaseUrl}/user`)
         .then((response) => {
           this.names = response.data.names;
         })
