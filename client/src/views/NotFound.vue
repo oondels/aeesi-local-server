@@ -1,7 +1,5 @@
 <template>
-  <div class="container-about">
-    <h1>Youn are in About</h1>
-  </div>
+  <h1>404 - Página não encontrada</h1>
 </template>
 
 <script>
