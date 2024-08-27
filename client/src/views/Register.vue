@@ -1,33 +1,37 @@
 <template>
   <div class="register">
     <div class="container-register-form">
-      <div class="title">Registration</div>
+      <div class="title">Cadastro de Cliente Novo</div>
       <div class="content">
         <form action="#">
           <div class="user-details">
             <div class="input-box">
-              <span class="details">Full Name</span>
-              <input type="text" placeholder="Enter your name" required />
+              <span class="details">Nome Completo</span>
+              <input type="text" placeholder="Nome" required />
             </div>
             <div class="input-box">
-              <span class="details">Username</span>
+              <span class="details">Data de Nascimento</span>
               <input type="text" placeholder="Enter your username" required />
             </div>
             <div class="input-box">
               <span class="details">Email</span>
-              <input type="text" placeholder="Enter your email" required />
+              <input type="text" placeholder="Email" required />
             </div>
             <div class="input-box">
-              <span class="details">Phone Number</span>
-              <input type="text" placeholder="Enter your number" required />
+              <span class="details">Número de Telefone</span>
+              <input type="text" placeholder="Celular" required />
             </div>
             <div class="input-box">
-              <span class="details">Password</span>
-              <input type="text" placeholder="Enter your password" required />
+              <span class="details">Cpf</span>
+              <input type="text" placeholder="CPF" required />
             </div>
             <div class="input-box">
-              <span class="details">Confirm Password</span>
-              <input type="text" placeholder="Confirm your password" required />
+              <span class="details">Horário de Treino</span>
+              <select name="select-time" id="selest-time">
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
+              </select>
             </div>
           </div>
           <div class="gender-details">

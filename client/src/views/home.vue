@@ -10,6 +10,12 @@
           <img src="/img/aplications/register.png" alt="" />
         </router-link>
       </div>
+      <div class="card-app">
+        <router-link to="/academy_clients">
+          <h4>Ver Clientes</h4>
+          <img src="/img/aplications/register.png" alt="" />
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
