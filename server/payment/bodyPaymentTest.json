@@ -1,0 +1,8 @@
+{
+  "transaction_amount": 1,
+  "description": "Pagamento de teste",
+  "payment_method_id": "pix",
+  "email": "hendriusfelix@gmail.com",
+  "identification": "CPF",
+  "identificationValue": "04894714558"
+}
