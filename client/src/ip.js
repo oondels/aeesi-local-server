@@ -1,3 +1,3 @@
-const ip = process.env.VUE_APP_API_BASE_URL || "localhost";
+const ip = "localhost";
 
-export default ip;
+module.exports = ip;

@@ -27,11 +27,12 @@
             </div>
             <div class="input-box">
               <span class="details">Horário de Treino</span>
-              <select name="select-time" id="selest-time">
-                <option value="Manhã">Manhã</option>
-                <option value="Tarde">Tarde</option>
-                <option value="Noite">Noite</option>
-              </select>
+              <v-select
+                label="Horário"
+                :items="['Manhã', 'Tarde', 'Noite']"
+                id="selest-time"
+              >
+              </v-select>
             </div>
           </div>
           <div class="gender-details">
@@ -42,15 +43,15 @@
             <div class="category">
               <label for="dot-1">
                 <span class="dot one"></span>
-                <span class="gender">Male</span>
+                <span class="gender">Homem</span>
               </label>
               <label for="dot-2">
                 <span class="dot two"></span>
-                <span class="gender">Female</span>
+                <span class="gender">Mulher</span>
               </label>
               <label for="dot-3">
                 <span class="dot three"></span>
-                <span class="gender">Prefer not to say</span>
+                <span class="gender">Prefiro não dizer</span>
               </label>
             </div>
           </div>
@@ -64,11 +65,27 @@
 </template>
 
 <script>
-export default {};
+export default {
+  name: "CadastroClientes",
+
+  data() {
+    return {
+      newClient: {
+        nome: "",
+        email: "",
+        cpf: null,
+        birth: "",
+        phone: null,
+        horario: "",
+        genero: "",
+      },
+    };
+  },
+};
 </script>
 
 <style scoped>
-/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
 .register {
   height: 100vh;
   display: flex;
