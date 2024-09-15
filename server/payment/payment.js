@@ -4,6 +4,7 @@ const client = require("./mercadoPagoConfig.js");
 const pool = require("../db/db.js");
 const { v4: uuidv4 } = require("uuid");
 const { Payment } = require("mercadopago");
+require("dotenv").config();
 
 const payment = new Payment(client);
 
@@ -105,7 +106,7 @@ router.post("/pix-payment", async (req, res) => {
       description: paymentDetails.paymentData.description,
       payment_method_id: paymentDetails.paymentData.payment_method_id,
       payer: {
-        email: paymentDetails.paymentData.email,
+        email: process.env.DEFAULT_EMAIL,
         identification: {
           type: paymentDetails.paymentData.identification,
           number: paymentDetails.paymentData.identificationValue,
@@ -156,7 +157,7 @@ router.post("/pix-payment-barcode", async (req, res) => {
       description: `Compra de ${product[0].name}`,
       payment_method_id: paymentDetails.paymentData.payment_method_id,
       payer: {
-        email: paymentDetails.paymentData.email,
+        email: process.env.DEFAULT_EMAIL,
         identification: {
           type: paymentDetails.paymentData.identification,
           number: paymentDetails.paymentData.identificationValue,
