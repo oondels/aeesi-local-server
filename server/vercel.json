@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "payment.js",
+      "src": "app.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "payment.js"
+      "dest": "app.js"
     }
   ]
 }
