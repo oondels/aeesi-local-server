@@ -31,9 +31,6 @@
         :product="item"
       />
     </div>
-    <div>
-      <CadastroItems />
-    </div>
   </div>
 </template>
 
@@ -111,65 +108,101 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .main {
-  background-color: #fff;
+  background-color: #f9f9f9;
   width: 100%;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(50, 50, 50, 0.3);
+  padding: 40px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
 .products-list {
   margin-top: 25px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
 }
 
 .header {
-  background-color: #4b4b4b;
-  padding: 20px;
+  background-color: #343a40;
+  padding: 30px;
   width: 100%;
-  position: relative;
-}
-
-.header img {
-  width: 100px;
-  position: absolute;
-  left: 1%;
+  text-align: center;
 }
 
 .header h1 {
   color: #fff;
+  font-size: 36px;
+  letter-spacing: 1px;
 }
+
 .search {
-  display: grid;
-  grid-template-columns: 700px 200px;
-  grid-template-rows: 60px;
+  display: flex;
+  align-items: center;
   background-color: #fff;
-  border-radius: 8px 0 0 8px;
-  width: 900px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 20px;
+  padding: 0 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .search input {
-  grid-column: 1;
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  box-sizing: border-box;
-  font-size: 16px;
-  color: #333;
+  flex: 1;
+  padding: 15px;
+  border: none;
+  font-size: 18px;
+  color: #555;
   outline: none;
+  background-color: transparent;
 }
 
 .search i {
-  grid-column: 2;
-  color: rgb(255, 255, 255);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(97, 207, 33);
-  font-size: 34px;
-  height: 100%;
+  color: #fff;
+  background-color: #61cf21;
+  border-radius: 50%;
+  padding: 12px;
+  font-size: 24px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search i:hover {
+  background-color: #4ba918;
+}
+
+.bipar-product h3 {
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.v-text-field {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.products-list {
+  margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+  .products-list {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .search {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search input {
+    margin-bottom: 10px;
+  }
 }
 </style>

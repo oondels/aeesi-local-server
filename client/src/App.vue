@@ -18,6 +18,12 @@
       </div>
     </nav>
     <router-view />
+    <footer class="footer">
+      <p>
+        © 2024 AEESI - Todos os direitos reservados. Desenvolvido por
+        <a href="hendriusfelix.com">Hendrius Félix</a>
+      </p>
+    </footer>
   </div>
 </template>
 
@@ -94,6 +100,20 @@ nav a:last-child {
 nav i:hover {
   transform: scale(1.1);
   transition: 0.2s ease;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 20px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  background: #232325;
+}
+
+.footer a {
+  text-decoration: none;
+  color: #42b983;
 }
 
 @media screen and (max-width: 768px) {

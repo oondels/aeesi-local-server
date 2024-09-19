@@ -6,57 +6,110 @@
         <form action="#">
           <div class="user-details">
             <div class="input-box">
-              <span class="details">Nome Completo</span>
-              <input type="text" placeholder="Nome" required />
+              <span class="details">Nome</span>
+
+              <input
+                v-model="newClient.nome"
+                type="text"
+                placeholder="Nome"
+                required
+              />
             </div>
+
             <div class="input-box">
               <span class="details">Data de Nascimento</span>
-              <input type="text" placeholder="Enter your username" required />
+              <input
+                v-model="newClient.birth"
+                type="date"
+                placeholder="Enter your username"
+                required
+              />
             </div>
+
             <div class="input-box">
               <span class="details">Email</span>
-              <input type="text" placeholder="Email" required />
+              <input
+                v-model="newClient.email"
+                type="text"
+                placeholder="Email"
+                required
+              />
             </div>
+
             <div class="input-box">
               <span class="details">Número de Telefone</span>
-              <input type="text" placeholder="Celular" required />
+              <input
+                v-model="newClient.phone"
+                type="tel"
+                placeholder="Celular"
+                required
+              />
             </div>
+
             <div class="input-box">
               <span class="details">Cpf</span>
-              <input type="text" placeholder="CPF" required />
+              <input
+                v-model="newClient.cpf"
+                type="number"
+                placeholder="CPF"
+                required
+              />
             </div>
+
             <div class="input-box">
               <span class="details">Horário de Treino</span>
               <v-select
                 label="Horário"
                 :items="['Manhã', 'Tarde', 'Noite']"
                 id="selest-time"
+                v-model="newClient.horario"
               >
               </v-select>
             </div>
-          </div>
-          <div class="gender-details">
-            <input type="radio" name="gender" id="dot-1" />
-            <input type="radio" name="gender" id="dot-2" />
-            <input type="radio" name="gender" id="dot-3" />
-            <span class="gender-title">Gender</span>
-            <div class="category">
-              <label for="dot-1">
-                <span class="dot one"></span>
-                <span class="gender">Homem</span>
-              </label>
-              <label for="dot-2">
-                <span class="dot two"></span>
-                <span class="gender">Mulher</span>
-              </label>
-              <label for="dot-3">
-                <span class="dot three"></span>
-                <span class="gender">Prefiro não dizer</span>
-              </label>
+
+            <div class="input-box">
+              <v-select
+                label="Gênero"
+                :items="['Masculino', 'Feminino', 'Prefiro não dizer']"
+                v-model="newClient.genero"
+              ></v-select>
+            </div>
+
+            <div class="input-box">
+              <v-combobox
+                label="Curso"
+                :items="['Jiu-Jitsu', 'Musculação', 'Box', 'Hit-Box']"
+                clearable
+                v-model="newClient.curso"
+              ></v-combobox>
+            </div>
+
+            <div class="checkbox-container">
+              <input
+                v-model="newClient.bolsa"
+                type="checkbox"
+                name="bolsa"
+                id="bolsa"
+              />
+              <label for="bolsa">Bolsista</label>
+            </div>
+
+            <div class="input-box">
+              <v-text-field
+                label="Endereço"
+                v-model="newClient.address"
+              ></v-text-field>
             </div>
           </div>
+
           <div class="button">
-            <input type="submit" value="Register" />
+            <v-btn
+              @click="
+                register();
+                resetForm();
+              "
+              >Cadastrar</v-btn
+            >
           </div>
         </form>
       </div>
@@ -65,6 +118,9 @@
 </template>
 
 <script>
+import axios from "axios";
+import ip from "../ip.js";
+
 export default {
   name: "CadastroClientes",
 
@@ -78,148 +134,212 @@ export default {
         phone: null,
         horario: "",
         genero: "",
+        bolsa: false,
+        address: "",
+        curso: "",
       },
     };
+  },
+
+  methods: {
+    register() {
+      if (
+        !this.newClient.nome ||
+        !this.newClient.email ||
+        !this.newClient.cpf ||
+        !this.newClient.birth ||
+        !this.newClient.phone ||
+        !this.newClient.horario ||
+        !this.newClient.genero ||
+        !this.newClient.address ||
+        !this.newClient.curso
+      ) {
+        return alert("Todos os campos devem ser preenchidos");
+      }
+
+      axios
+        .post(`http://${ip}:2399/register-client`, this.newClient)
+        .then((response) => {
+          alert(response.data);
+        })
+        .catch((error) => {
+          console.error("Erro ao cadastrar cliente: ", error);
+        });
+    },
+
+    resetForm() {
+      this.newClient = {
+        nome: "",
+        email: "",
+        cpf: null,
+        birth: "",
+        phone: null,
+        horario: "",
+        genero: "",
+        bolsa: false,
+        address: "",
+        curso: "",
+      };
+    },
   },
 };
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
 .register {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: #f4f4f9;
+  padding: 20px;
 }
+
 .container-register-form {
-  max-width: 700px;
   width: 100%;
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 5px;
-  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
 }
+
 .container-register-form .title {
-  font-size: 25px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
   position: relative;
 }
-.container-register-form .title::before {
+
+.container-register-form .title::after {
   content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
+  width: 50px;
   height: 3px;
-  width: 30px;
-  border-radius: 5px;
-  background: linear-gradient(135deg, #66e771, #0c8a01);
+  background-color: #61cf21;
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
 }
+
 .content form .user-details {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  margin: 20px 0 12px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
-form .user-details .input-box {
-  margin-bottom: 15px;
-  width: calc(100% / 2 - 20px);
+
+form .input-box {
+  position: relative;
 }
+
 form .input-box span.details {
   display: block;
-  font-weight: 500;
-  margin-bottom: 5px;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #666;
 }
-.user-details .input-box input {
-  height: 45px;
+
+.user-details .input-box input,
+.user-details .input-box v-text-field {
   width: 100%;
-  outline: none;
+  padding: 12px;
   font-size: 16px;
+  border: 1px solid #ddd;
   border-radius: 5px;
-  padding-left: 15px;
-  border: 1px solid #ccc;
-  transition: all 0.3s ease;
+  outline: none;
+  transition: border 0.3s ease;
 }
-.user-details .input-box input:focus,
-.user-details .input-box input:valid {
-  border-color: #0f7918;
+
+.user-details .input-box input:focus {
+  border-color: #61cf21;
 }
-form .gender-details .gender-title {
-  font-size: 20px;
-  font-weight: 500;
+
+.user-details .input-box input::placeholder {
+  color: #aaa;
 }
-form .category {
-  display: flex;
-  width: 80%;
-  margin: 14px 0;
-  justify-content: space-between;
-}
-form .category label {
+
+.checkbox-container {
+  grid-column: span 2;
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
-form .category label .dot {
-  height: 18px;
-  width: 18px;
-  border-radius: 50%;
+
+.checkbox-container input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
   margin-right: 10px;
-  background: #d9d9d9;
-  border: 5px solid transparent;
-  transition: all 0.3s ease;
 }
-#dot-1:checked ~ .category label .one,
-#dot-2:checked ~ .category label .two,
-#dot-3:checked ~ .category label .three {
-  background: #ffffff;
-  border-color: #12c901;
+
+.checkbox-container input[type="checkbox"]:checked {
+  background-color: #61cf21;
+  border-color: #61cf21;
 }
-form input[type="radio"] {
-  display: none;
+
+.checkbox-container input[type="checkbox"]:checked::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 7px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
-form .button {
-  height: 45px;
-  margin: 35px 0;
+
+.checkbox-container label {
+  font-size: 16px;
+  color: #333;
 }
-form .button input {
-  height: 100%;
-  width: 100%;
+
+.button {
+  grid-column: span 2;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.button v-btn {
+  background-color: #61cf21;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
   border-radius: 5px;
-  border: none;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #12c901;
+  transition: background-color 0.3s ease;
 }
-form .button input:hover {
-  transform: scale(0.99);
-  background-color: #52da45;
+
+.button v-btn:hover {
+  background-color: #4ba918;
 }
-@media (max-width: 584px) {
-  .container-register-form {
-    max-width: 100%;
-  }
-  form .user-details .input-box {
-    margin-bottom: 15px;
-    width: 100%;
-  }
-  form .category {
-    width: 100%;
-  }
+
+@media (max-width: 768px) {
   .content form .user-details {
-    max-height: 300px;
-    overflow-y: scroll;
-  }
-  .user-details::-webkit-scrollbar {
-    width: 5px;
+    grid-template-columns: 1fr;
   }
 }
-@media (max-width: 459px) {
-  .container-register-form .content .category {
-    flex-direction: column;
+
+@media (max-width: 500px) {
+  .container-register-form {
+    padding: 20px;
+  }
+
+  .container-register-form .title {
+    font-size: 20px;
+  }
+
+  .button v-btn {
+    font-size: 14px;
+    padding: 10px 15px;
   }
 }
 </style>

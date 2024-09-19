@@ -31,21 +31,24 @@
           <template v-slot:default="{ isActive }">
             <v-card :title="product.name">
               <v-card-text class="d-flex flex-column">
-                <div v-if="checkPayment" class="d-flex flex-row check-payment">
+                <div
+                  v-if="checkPayment"
+                  class="d-flex flex-row justify-content-center align-items-center check-payment"
+                >
                   <v-btn @click="checkPaymentStatus(product.id)">
                     Verificar pagamento
                   </v-btn>
-                  <h4 :class="paymentStatus ? 'pago' : 'pendente'">
+                  <h4 :class="paymentStatus === 'paid' ? 'pago' : 'pendente'">
                     <i
                       :class="
-                        paymentStatus
+                        paymentStatus === 'paid'
                           ? 'material-symbols-outlined'
                           : 'material-symbols-outlined'
                       "
                     >
-                      {{ paymentStatus ? "paid" : "pending" }}
+                      {{ paymentStatus === "paid" ? "paid" : "pending" }}
                     </i>
-                    {{ paymentStatus ? "Pago!" : "Pendente" }}
+                    {{ paymentStatus === "paid" ? "Pago!" : "Pendente" }}
                   </h4>
                 </div>
 

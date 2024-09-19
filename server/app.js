@@ -18,7 +18,43 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get("/get-academy_clients", async (req, res) => {
+app.post("/register-client", async (req, res) => {
+  try {
+    const data = req.body;
+
+    const query = pool.query(
+      `
+     INSERT INTO clients.academy_clients
+     (name, birth, cpf, phone, email, course, address, bolsista, schedule, gender)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `,
+      [
+        data.nome,
+        data.birth,
+        data.cpf,
+        data.phone,
+        data.email,
+        data.curso,
+        data.address,
+        data.bolsa,
+        data.horario,
+        data.genero,
+      ]
+    );
+
+    const nome = data.nome.split(" ")[0];
+    const sobrenome = data.nome.split(" ")[data.nome.split(" ").length - 1];
+
+    res
+      .status(200)
+      .send(`O cliente ${nome} ${sobrenome} foi cadastrado com sucesso!`);
+  } catch (error) {
+    console.error(`Erro interno no servidor: ${error}`);
+    res.status(500).send("Erro interno no servidor: ", error);
+  }
+});
+
+app.get("/get-academy-clients", async (req, res) => {
   try {
     const query = await pool.query("SELECT * FROM clients.academy_clients");
     const users = query.rows;

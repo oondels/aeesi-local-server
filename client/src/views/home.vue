@@ -1,77 +1,84 @@
 <template>
   <div class="container-home">
-    <div class="home-title">
-      <h1 class="text-center">Central de aplicações AEESI.</h1>
-    </div>
+    <div class="home-title"></div>
     <div class="aplicacoes">
-      <div class="m-3 card-app">
-        <router-link to="/register">
-          <h4>Cadastro de Clientes</h4>
-          <img src="/img/aplications/register.png" alt="" />
-        </router-link>
-      </div>
+      <router-link class="card-app" to="/register">
+        <h4>Cadastro de Clientes</h4>
+        <p>Gerencie o cadastro de seus clientes.</p>
+        <img src="/img/aplications/register.png" alt="Cadastro de Clientes" />
+      </router-link>
 
-      <div class="m-3 card-app">
-        <router-link to="/academy_clients">
+      <router-link to="/academy_clients">
+        <div class="m-3 card-app">
           <h4>Ver Clientes</h4>
-          <img src="/img/aplications/clients.png" alt="" />
-        </router-link>
-      </div>
+          <p>Acesse a lista de clientes cadastrados.</p>
+          <img src="/img/aplications/clients.png" alt="Ver Clientes" />
+        </div>
+      </router-link>
 
-      <div class="m-3 card-app">
-        <router-link to="/loja">
+      <router-link to="/loja">
+        <div class="m-3 card-app">
           <h4>Loja</h4>
-          <img src="/img/aplications/store.png" alt="" />
-        </router-link>
-      </div>
+          <p>Explore nosso catálogo de produtos.</p>
+          <img src="/img/aplications/store.png" alt="Loja" />
+        </div>
+      </router-link>
     </div>
   </div>
 </template>
 
-<script>
-export default {};
-</script>
-
 <style scoped>
 .container-home {
   height: 100vh;
+  background: linear-gradient(to right, #f7f7f7, #e6e6e6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .aplicacoes {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  padding-top: 20px;
 }
 
 .card-app {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  width: 250px;
-  height: 100px;
-  background-color: rgb(255, 255, 255);
-  padding: 8px;
-  border-radius: 1.2rem;
+  justify-content: center;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin: 10px;
 }
 
 .card-app:hover {
-  box-shadow: none;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
 }
 
-.card-app a {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
+a {
   text-decoration: none;
   color: #2c3e50;
+  text-align: center;
 }
 
-.card-app a img {
-  width: 50px;
+a img {
+  width: 70px;
+  margin-top: 10px;
+}
+
+p {
+  text-align: center;
+  color: #666;
+  font-size: 0.8rem;
 }
 </style>
