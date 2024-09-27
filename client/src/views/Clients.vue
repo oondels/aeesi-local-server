@@ -39,12 +39,10 @@
             <td>{{ client.email }}</td>
             <td>{{ client.phone }}</td>
             <td>
-              {{
-                convertAge(client.birth) ? convertAge(client.birth) : "--"
-              }}
+              {{ convertAge(client.birth) ? convertAge(client.birth) : "--" }}
               anos
             </td>
-            <td>{{ client.bolsista }}</td>
+            <td>{{ client.bolsista ? "Sim" : "Não" }}</td>
           </tr>
         </tbody>
       </table>

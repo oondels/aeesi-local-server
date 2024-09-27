@@ -15,6 +15,9 @@
   >
     <div class="bipar-product">
       <h3>Compre Rapidamente</h3>
+
+      <CadastroItems />
+
       <v-text-field
         v-model="barCode"
         type="number"

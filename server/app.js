@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("./db/db.js");
 const paymentRoutes = require("./payment/payment.js");
+const multer = require("multer");
+const path = require("path");
 
 const app = express();
 const port = 2399;
@@ -22,7 +24,7 @@ app.post("/register-client", async (req, res) => {
   try {
     const data = req.body;
 
-    const query = pool.query(
+    const query = await pool.query(
       `
      INSERT INTO clients.academy_clients
      (name, birth, cpf, phone, email, course, address, bolsista, schedule, gender)
@@ -80,16 +82,16 @@ app.get("/getAllProducts", async (req, res) => {
   }
 });
 
-app.post("/registerItem", async (req, res) => {
+app.post("/register-item", async (req, res) => {
   try {
     const newItem = req.body;
 
     const register = await pool.query(
       `
         INSERT INTO
-          loja.items_loja (name, category, description, cost_price, selling_price, min_stock, validity, supplier)
+          loja.items_loja (name, category, description, cost_price, selling_price, min_stock, validity, supplier, image)
         VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8)
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       `,
       [
         newItem.name,
@@ -100,6 +102,7 @@ app.post("/registerItem", async (req, res) => {
         newItem.minStock,
         newItem.validity,
         newItem.supplier,
+        newItem.image,
       ]
     );
 
@@ -107,4 +110,20 @@ app.post("/registerItem", async (req, res) => {
   } catch (error) {
     console.error("Erro interno no servidor: ", error);
   }
+});
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../client/src/assets/img/loja"));
+  },
+
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const upload = multer({ storage });
+
+app.post("/upload", upload.single("file"), (req, res) => {
+  res.json({ message: "Upload realizado com sucesso!", file: req.file });
 });

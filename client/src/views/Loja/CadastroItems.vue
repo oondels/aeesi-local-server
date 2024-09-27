@@ -56,9 +56,20 @@
                 v-model="newItem.supplier"
                 label="Fornecedor"
               ></v-text-field>
+
+              <!-- <v-text-field
+                v-model="newItem.barcode"
+                label="Código de Barras"
+              ></v-text-field> -->
+            </div>
+            <div class="col-12">
+              <label for="file">Escolha uma imagem</label>
+              <input @change="onFileChange" name="file" id="file" type="file" />
             </div>
 
-            <v-btn @click="registerItem" color="success">Salvar</v-btn>
+            <v-btn @click="uploadImage(), registerItem()" color="success">
+              Salvar
+            </v-btn>
           </div>
         </v-card-text>
 
@@ -83,6 +94,8 @@ export default {
     return {
       allProducts: {},
 
+      file: "",
+
       newItem: {
         name: "",
         category: "",
@@ -92,6 +105,8 @@ export default {
         minStock: null,
         validity: "",
         supplier: "",
+        barcode: null,
+        image: "",
       },
     };
   },
@@ -99,6 +114,43 @@ export default {
   mounted() {},
 
   methods: {
+    onFileChange(event) {
+      // Capturando arquivo
+      const file = event.target.files[0];
+
+      // Renomeando arquivo
+      if (this.newItem.name) {
+        const newFileName =
+          `${this.newItem.name
+            .replace(/\s+/g, "_")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")}.` + file.name.split(".").pop();
+        this.file = new File([file], newFileName, { type: file.type });
+      }
+      return;
+    },
+
+    uploadImage() {
+      if (this.file) {
+        const formData = new FormData();
+        formData.append("file", this.file);
+
+        axios
+          .post(`http://${ip}:2399/upload`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            console.log("Upload bem-sucedido:", response.data);
+          })
+          .catch((error) => {
+            console.error("Erro no upload:", error);
+          });
+      }
+      return;
+    },
+
     registerItem() {
       if (
         !this.newItem.name ||
@@ -114,7 +166,7 @@ export default {
       }
 
       axios
-        .post(`http://${ip}:2399/registerItem`, this.newItem)
+        .post(`http://${ip}:2399/register-item`, this.newItem)
         .then((response) => {
           console.log(response.data);
         })
@@ -132,6 +184,8 @@ export default {
         validity: "",
         supplier: "",
       };
+
+      this.file = "";
     },
   },
 };
