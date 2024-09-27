@@ -63,7 +63,7 @@ router.get("/checkPaymentStatus", async (req, res) => {
   }
 });
 
-router.post("/webhook", (req, res) => {
+router.post("/web-hooks", (req, res) => {
   try {
     const paymentData = req.body;
 
@@ -106,7 +106,8 @@ router.post("/pix-payment", async (req, res) => {
       ),
       description: paymentDetails.paymentData.description,
       payment_method_id: paymentDetails.paymentData.payment_method_id,
-      notification_url: "https://aeesi-local-server.vercel.app/web-hooks",
+      notification_url:
+        "https://aeesi-local-server.vercel.app/payment/web-hooks",
       payer: {
         email: "hendriusfelix@gmail.com",
         identification: {
