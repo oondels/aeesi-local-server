@@ -63,7 +63,7 @@ router.get("/checkPaymentStatus", async (req, res) => {
   }
 });
 
-router.post("/web-hooks", (req, res) => {
+router.post("/web-hooks", async (req, res) => {
   try {
     const paymentData = req.body;
 
@@ -77,7 +77,7 @@ router.post("/web-hooks", (req, res) => {
 
       const paymentId = paymentData.data.id;
 
-      const paymentDetail = payment.findById(paymentId);
+      const paymentDetail = await payment.get({ id: paymentId });
 
       res.status(200).send("Webhook processado com sucesso.");
     } else {
