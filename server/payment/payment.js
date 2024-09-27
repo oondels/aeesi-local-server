@@ -106,7 +106,7 @@ router.post("/pix-payment", async (req, res) => {
       description: paymentDetails.paymentData.description,
       payment_method_id: paymentDetails.paymentData.payment_method_id,
       payer: {
-        email: process.env.DEFAULT_EMAIL,
+        email: "hendriusfelix@gmail.com",
         identification: {
           type: paymentDetails.paymentData.identification,
           number: paymentDetails.paymentData.identificationValue,

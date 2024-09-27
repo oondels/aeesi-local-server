@@ -110,6 +110,7 @@ export default {
 
   methods: {
     buyProduct(id, name, amount) {
+      console.log(id, name, amount);
       const paymentData = {
         transaction_amount: amount,
         description: `Compra de ${name}`,
@@ -120,7 +121,8 @@ export default {
         productId: id,
         productName: name,
       };
-
+      console.log(ip);
+      console.log(paymentData);
       axios
         .post(`http://${ip}:2399/payment/pix-payment`, {
           data: {
