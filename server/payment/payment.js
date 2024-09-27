@@ -64,29 +64,30 @@ router.get("/checkPaymentStatus", async (req, res) => {
 });
 
 router.post("/webhook", (req, res) => {
-  const paymentData = req.body;
+  try {
+    const paymentData = req.body;
 
-  // Verifica se a notificação é de um pagamento
-  if (
-    paymentData.type === "payment" &&
-    paymentData.data &&
-    paymentData.data.id
-  ) {
-    const paymentId = paymentData.data.id;
+    console.log(paymentData);
 
-    // Aqui, você pode realizar ações adicionais, como armazenar o ID do pagamento,
-    // enviar uma notificação ao usuário, etc.
+    if (
+      paymentData.action === "payment.created" ||
+      paymentData.action === "payment.updated"
+    ) {
+      console.log("Novo pagamento registrado: ", paymentData.data.id);
 
-    console.log(`Pagamento confirmado: ${paymentId}`);
+      const paymentId = paymentData.data.id;
 
-    // (Opcional) Chame a API do Mercado Pago para obter detalhes adicionais do pagamento
-    // Ver exemplo mais abaixo
+      const paymentDetail = payment.findById(paymentId);
 
-    // Retorna uma resposta ao Mercado Pago para confirmar que a notificação foi recebida
-    res.status(200).send("OK");
-  } else {
-    // Caso a notificação não seja de pagamento ou esteja incompleta
-    res.status(400).send("Evento não reconhecido.");
+      res.status(200).send("Webhook processado com sucesso.");
+    } else {
+      console.log("Ação não tratada: ", paymentData.action);
+
+      res.status(400).send("Ação não tratada.");
+    }
+  } catch (error) {
+    console.error("Erro ao processar webhook:", error);
+    res.status(500).send("Erro ao processar webhook.");
   }
 });
 
@@ -105,6 +106,7 @@ router.post("/pix-payment", async (req, res) => {
       ),
       description: paymentDetails.paymentData.description,
       payment_method_id: paymentDetails.paymentData.payment_method_id,
+      notification_url: "https://aeesi-local-server.vercel.app/web-hooks",
       payer: {
         email: "hendriusfelix@gmail.com",
         identification: {
