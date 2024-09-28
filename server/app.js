@@ -1,18 +1,28 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./db/db.js");
-const paymentRoutes = require("./payment/payment.js");
 const multer = require("multer");
 const path = require("path");
+const http = require("http");
 
 const app = express();
 const port = 2399;
+
+const server = http.createServer(app);
+
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+const paymentRoutes = require("./payment/payment.js")(io);
 
 app.use(cors());
 app.use(express.json());
 app.use("/payment", paymentRoutes);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log("Server listening on port: ", port);
 });
 
