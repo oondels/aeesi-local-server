@@ -26,44 +26,116 @@
             <th>Telefone</th>
             <th>Idade</th>
             <th>Bolsista</th>
-            <th>Pagamento</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr
-            v-for="(client, clientIndex) in clientsFiltered"
-            :key="clientIndex"
-          >
-            <td>{{ client.name }}</td>
-            <td>{{ client.course }}</td>
-            <td>{{ client.email }}</td>
-            <td>{{ client.phone }}</td>
-            <td>
-              {{ convertAge(client.birth) ? convertAge(client.birth) : "--" }}
-              anos
-            </td>
-            <td>{{ client.bolsista ? "Sim" : "Não" }}</td>
-            <td>
-              {{
-                (client.monthly_payment_status = "pendind"
-                  ? "Não realizado"
-                  : "Realizado")
-              }}
-            </td>
-          </tr>
+          <v-dialog max-width="800">
+            <template v-slot:activator="{ props: activatorProps }">
+              <tr
+                v-for="(client, clientIndex) in clientsFiltered"
+                :key="clientIndex"
+                v-bind="activatorProps"
+                @click="getClientPaymentHistory(client.id)"
+              >
+                <td>{{ client.name }}</td>
+                <td>{{ client.course }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.phone }}</td>
+                <td>
+                  {{
+                    convertAge(client.birth) ? convertAge(client.birth) : "--"
+                  }}
+                  anos
+                </td>
+                <td>{{ client.bolsista ? "Sim" : "Não" }}</td>
+              </tr>
+            </template>
+
+            <template v-slot:default="{ isActive }">
+              <v-card>
+                <v-card-text>
+                  <div class="card mb-3">
+                    <div class="card-header">
+                      <h5 class="text-center">Histórico de Pagamentos</h5>
+                    </div>
+                    <div class="card-body">
+                      <table class="table custom-table">
+                        <thead>
+                          <tr>
+                            <th>Mês</th>
+                            <th>Ano</th>
+                            <th>Status de Pagamento</th>
+                            <th>Ação</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="history in clientHistory"
+                            :key="history.id"
+                          >
+                            <td>{{ history.mes_pagamento }}</td>
+                            <td>{{ history.ano_pagamento }}</td>
+                            <td>
+                              <span
+                                :class="{
+                                  'badge bg-success': history.payment_status,
+                                  'badge bg-danger': !history.payment_status,
+                                }"
+                              >
+                                {{
+                                  history.payment_status ? "Pago" : "Não Pago"
+                                }}
+                              </span>
+                            </td>
+                            <td>
+                              <v-btn
+                                v-if="!history.payment_status"
+                                @click="
+                                  registerPayment(
+                                    history.client_id,
+                                    history.mes_pagamento
+                                  )
+                                "
+                                color="success"
+                                variant="outlined"
+                              >
+                                Registrar Pagamento
+                              </v-btn>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <v-btn text="Fechar" @click="isActive.value = false"></v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+          </v-dialog>
         </tbody>
       </table>
     </div>
   </div>
+  <alert ref="alert" />
 </template>
 
 <script>
+import Alert from "@/components/Alert.vue";
 import axios from "axios";
 import ip from "../ip.js";
 
 export default {
   name: "Clients",
+
+  components: {
+    Alert,
+  },
 
   data() {
     return {
@@ -71,6 +143,8 @@ export default {
       clientsFiltered: null,
       selectedClient: "",
       selectedCourse: "",
+
+      clientHistory: null,
 
       courses: [],
       clientsNames: [],
@@ -99,6 +173,48 @@ export default {
         })
         .catch((error) => {
           console.log("Error ao consultar servidor:", error);
+        });
+    },
+
+    getClientPaymentHistory(id) {
+      axios
+        .get(`${ip}/get-client-payment-history/${id}`)
+        .then((response) => {
+          this.clientHistory = response.data;
+          // console.log(this.clientHistory);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
+    registerPayment(clientId, month) {
+      console.log(clientId, month);
+      axios
+        .post(`${ip}/register-payment`, {
+          clientId,
+          month,
+        })
+        .then((response) => {
+          this.$refs.alert.mostrarAlerta(
+            "success",
+            "done_outline",
+            "Sucesso",
+            response.data
+          );
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        })
+        .catch((error) => {
+          console.error(`Erro ao registrar pagamento: ${error}`);
+          return this.$refs.alert.mostrarAlerta(
+            "danger",
+            "warning",
+            "Sucesso",
+            error.response.data
+          );
         });
     },
 
@@ -134,9 +250,7 @@ export default {
     checkDate() {
       axios
         .put(`${ip}/reset-payment-status`)
-        .then((response) => {
-          console.log(response.data);
-        })
+        .then(() => {})
         .catch((error) => {
           console.error(error);
         });
@@ -209,5 +323,92 @@ export default {
 
 .content-table tbody tr:last-of-type {
   border-bottom: 2px solid #009879;
+}
+
+/* Tabela */
+.table-responsive {
+  margin-top: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.custom-table thead th {
+  background-color: #4a90e2;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 15px;
+  text-align: center;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.3s ease;
+}
+
+.custom-table tbody td {
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #494848;
+  font-size: 16px;
+}
+
+.badge {
+  font-size: 14px;
+  padding: 8px 15px;
+  border-radius: 50px;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.badge.bg-success {
+  background-color: #28a745;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  .custom-table thead {
+    display: none;
+  }
+
+  .custom-table tbody td {
+    display: block;
+    text-align: right;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+    position: relative;
+  }
+
+  .custom-table tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    top: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .custom-table tbody tr {
+    display: block;
+    margin-bottom: 10px;
+    background-color: white;
+  }
+
+  .custom-table tbody tr:hover {
+    background-color: transparent;
+  }
 }
 </style>

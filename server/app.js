@@ -79,24 +79,45 @@ app.get("/get-academy-clients", async (req, res) => {
   }
 });
 
-app.get("/get-client-payment-status", async (req, res) => {
+app.get("/get-client-payment-history/:id", async (req, res) => {
   try {
-    const clientId = req.query.id;
+    const clientId = req.params.id;
 
     const query = await pool.query(
       `
+      WITH months AS (
+      SELECT generate_series(1, 12) AS mes_pagamento
+      )
       SELECT 
-        ac.name, ac.birth, ac.cpf, ac.phone, ac.email, ac.course, ac.address, ac.bolsista, ac.schedule, ac.gender, ac.id, 
-        EXTRACT(MONTH FROM ap.create_date) as mes_pagamento, EXTRACT(YEAR FROM ap.create_date) as ano_pagamento, ap.payment_status, ap.id_client
+          ac.name, 
+          ac.birth, 
+          ac.cpf, 
+          ac.phone, 
+          ac.email, 
+          ac.course, 
+          ac.address, 
+          ac.bolsista, 
+          ac.schedule, 
+          ac.gender, 
+          ac.id AS client_id, 
+          months.mes_pagamento, 
+          COALESCE(EXTRACT(YEAR FROM ap.payment_date), EXTRACT(YEAR FROM CURRENT_DATE)) AS ano_pagamento,
+          COALESCE(ap.payment_status, false) AS payment_status,
+          ap.id_client
       FROM 
-        clients.academy_clients ac
+          clients.academy_clients ac
+      CROSS JOIN
+          months
       LEFT JOIN 
-        clients.payment ap
-      ON
-        ac.id = ap.id_client
-      WHERE
-        EXTRACT(YEAR FROM ap.create_date) = EXTRACT(YEAR FROM CURRENT_DATE) AND
-        ac.id = $1
+          clients.payment ap
+      ON 
+          ac.id = ap.id_client
+          AND EXTRACT(MONTH FROM ap.payment_date) = months.mes_pagamento
+          AND EXTRACT(YEAR FROM ap.payment_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+      WHERE 
+          ac.id = $1
+      ORDER BY 
+          months.mes_pagamento;
       `,
       [clientId]
     );
@@ -106,6 +127,29 @@ app.get("/get-client-payment-status", async (req, res) => {
   } catch (error) {
     console.error("Erro ao consultar banco de dados: ", error);
     return res.status(500).json(`{Error: ${error}}`);
+  }
+});
+
+app.post("/register-payment", async (req, res) => {
+  try {
+    const { clientId, month } = req.body;
+    const currentDate = new Date();
+
+    let date = `2024-`;
+    date += month + "-" + currentDate.getDate();
+
+    const query = await pool.query(
+      `
+      INSERT INTO clients.payment (id_client, payment_status, payment_date, create_date, update_date)
+      VALUES ($1, true, $2, NOW(), NOW())
+    `,
+      [clientId, date]
+    );
+
+    return res.status(200).send("Pagamento registrado com sucesso!");
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Erro interno no servidor");
   }
 });
 
