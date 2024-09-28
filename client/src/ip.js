@@ -1,3 +1,3 @@
-const ip = "localhost";
+const ip = "http://localhost:2399";
 
 module.exports = ip;

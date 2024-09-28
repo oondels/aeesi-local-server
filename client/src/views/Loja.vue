@@ -14,25 +14,20 @@
     class="main d-flex justify-content-center flex-column align-items-center"
   >
     <div class="bipar-product">
-      <h3>Compre Rapidamente</h3>
+      <!-- <h3>Compre Rapidamente</h3> -->
 
       <CadastroItems />
 
-      <v-text-field
+      <!-- <v-text-field
         v-model="barCode"
         type="number"
         label="Bipar"
         @keyup="buyProduct"
-      ></v-text-field>
+      ></v-text-field> -->
     </div>
 
     <div class="products-list">
-      <CompraItems
-        :class="'product-' + item.id"
-        v-for="item in allProducts"
-        :key="item.id"
-        :product="item"
-      />
+      <CompraItems v-for="item in allProducts" :key="item.id" :product="item" />
     </div>
   </div>
 </template>
@@ -60,12 +55,13 @@ export default {
 
   mounted() {
     this.getAllProducts();
+    console.log(ip);
   },
 
   methods: {
     getAllProducts() {
       axios
-        .get(`http://${ip}:2399/getAllProducts`)
+        .get(`${ip}/getAllProducts`)
         .then((response) => {
           this.allProducts = response.data;
         })
@@ -85,7 +81,7 @@ export default {
 
       if (this.barCode) {
         axios
-          .post(`http://${ip}:2399/payment/pix-payment-barcode`, {
+          .post(`${ip}/payment/pix-payment-barcode`, {
             data: {
               paymentData: paymentData,
             },

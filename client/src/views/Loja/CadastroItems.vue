@@ -136,7 +136,7 @@ export default {
         formData.append("file", this.file);
 
         axios
-          .post(`http://${ip}:2399/upload`, formData, {
+          .post(`${ip}:2399/upload`, formData, {
             headers: {
               "Content-Type": "multipart/form-data",
             },
@@ -166,7 +166,7 @@ export default {
       }
 
       axios
-        .post(`http://${ip}:2399/register-item`, this.newItem)
+        .post(`${ip}:2399/register-item`, this.newItem)
         .then((response) => {
           console.log(response.data);
         })

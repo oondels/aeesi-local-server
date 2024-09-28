@@ -26,6 +26,7 @@
             <th>Telefone</th>
             <th>Idade</th>
             <th>Bolsista</th>
+            <th>Pagamento</th>
           </tr>
         </thead>
 
@@ -43,6 +44,13 @@
               anos
             </td>
             <td>{{ client.bolsista ? "Sim" : "Não" }}</td>
+            <td>
+              {{
+                (client.monthly_payment_status = "pendind"
+                  ? "Não realizado"
+                  : "Realizado")
+              }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -72,13 +80,13 @@ export default {
   mounted() {
     this.getClients();
     this.filterClients();
-    this.convertAge("23/07/1999");
+    this.checkDate();
   },
 
   methods: {
     getClients() {
       axios
-        .get(`http://${ip}:2399/get-academy-clients`)
+        .get(`${ip}/get-academy-clients`)
         .then((response) => {
           this.clients = response.data;
           this.filterClients();
@@ -121,6 +129,17 @@ export default {
       }
 
       return (this.clientsFiltered = this.clients);
+    },
+
+    checkDate() {
+      axios
+        .put(`${ip}/reset-payment-status`)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };

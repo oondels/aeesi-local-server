@@ -158,7 +158,7 @@ export default {
       }
 
       axios
-        .post(`http://${ip}:2399/register-client`, this.newClient)
+        .post(`${ip}:2399/register-client`, this.newClient)
         .then((response) => {
           alert(response.data);
         })

@@ -3,8 +3,6 @@ const router = express.Router();
 const pool = require("../db/db.js");
 const { v4: uuidv4 } = require("uuid");
 
-const WebSocket = require("ws");
-
 const client = require("./mercadoPagoConfig.js");
 const { Payment } = require("mercadopago");
 require("dotenv").config();
@@ -12,14 +10,6 @@ require("dotenv").config();
 const payment = new Payment(client);
 
 module.exports = function (io) {
-  io.on("connection", (socket) => {
-    console.log(`Novo cliente conectado ${socket.id}`);
-
-    socket.on("disconnect", () => {
-      // console.log(`Cliente ${socket.id} desconectado`);
-    });
-  });
-
   // Teste de status de pagamento
   async function verificarStatusPagamento(paymentId) {
     try {
@@ -44,31 +34,34 @@ module.exports = function (io) {
     let status = "";
     let liberado = false;
 
-    // const query = `
-    //   UPDATE loja.items_loja
-    //   SET
-    //     stock = stock - 1
-    //   WHERE
-    //     id = $1
-    // `;
+    const query = `
+      UPDATE loja.items_loja
+      SET
+        stock = stock - 1
+      WHERE
+        id = $1
+    `;
 
     try {
       // Obtém o status do pagamento
       const response = await payment.get({ id: id });
       status = response.status;
 
+      console.log(status);
+
       // Define liberado com base no status (ajuste conforme necessário)
-      if (status) {
+      if (status === "approved") {
         liberado = true;
       } // Ajuste a condição conforme necessário
 
       // Atualiza o estoque se liberado for verdadeiro
-      // if (liberado) {
-      //   await pool.query(query, [productId]);
-      // }
-      console.log(status);
+      if (liberado) {
+        await pool.query(query, [productId]);
+      }
+
       // Envia a resposta ao cliente
-      return res.status(200).json({ status });
+      // Retirar pproved, esta somente para teste
+      return res.status(200).json({ status: "approved" });
     } catch (error) {
       console.log("Erro ao consultar status de pagamento: ", error);
       return res.status(500).send(error);
@@ -78,8 +71,6 @@ module.exports = function (io) {
   router.post("/web-hooks", async (req, res) => {
     try {
       const paymentData = req.body;
-
-      io.emit("newSale", "Nova compra emitida");
 
       if (
         paymentData.action === "paymenapprovedt.created" ||
@@ -103,11 +94,6 @@ module.exports = function (io) {
             [paymentDetail.status, paymentId]
           );
         }
-
-        io.emit("paymnetResult", {
-          message: "Pagamento processado",
-          status: paymentDetail.status,
-        });
 
         res.status(200).send("Webhook processado com sucesso.");
       } else {
@@ -134,8 +120,6 @@ module.exports = function (io) {
         transaction_amount: parseFloat(paymentData.transaction_amount),
         description: paymentData.description,
         payment_method_id: paymentData.payment_method_id,
-        notification_url:
-          "https://aeesi-local-server.vercel.app/payment/web-hooks",
         payer: {
           email: paymentData.email,
           identification: {

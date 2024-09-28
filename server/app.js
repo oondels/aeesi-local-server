@@ -4,6 +4,7 @@ const pool = require("./db/db.js");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
+const payment = require("./payment/payment.js");
 
 const app = express();
 const port = 2399;
@@ -68,7 +69,7 @@ app.post("/register-client", async (req, res) => {
 
 app.get("/get-academy-clients", async (req, res) => {
   try {
-    const query = await pool.query("SELECT * FROM clients.academy_clients");
+    const query = await pool.query(`SELECT * FROM clients.academy_clients`);
     const users = query.rows;
 
     return res.status(200).json(users);
@@ -76,6 +77,52 @@ app.get("/get-academy-clients", async (req, res) => {
     console.error("Erro ao consultar banco de dados: ", error);
     return res.status(500).json(`{Error: ${error}}`);
   }
+});
+
+app.get("/get-client-payment-status", async (req, res) => {
+  try {
+    const clientId = req.query.id;
+
+    const query = await pool.query(
+      `
+      SELECT 
+        ac.name, ac.birth, ac.cpf, ac.phone, ac.email, ac.course, ac.address, ac.bolsista, ac.schedule, ac.gender, ac.id, 
+        EXTRACT(MONTH FROM ap.create_date) as mes_pagamento, EXTRACT(YEAR FROM ap.create_date) as ano_pagamento, ap.payment_status, ap.id_client
+      FROM 
+        clients.academy_clients ac
+      LEFT JOIN 
+        clients.payment ap
+      ON
+        ac.id = ap.id_client
+      WHERE
+        EXTRACT(YEAR FROM ap.create_date) = EXTRACT(YEAR FROM CURRENT_DATE) AND
+        ac.id = $1
+      `,
+      [clientId]
+    );
+    const paymentDetail = query.rows;
+
+    return res.status(200).json(paymentDetail);
+  } catch (error) {
+    console.error("Erro ao consultar banco de dados: ", error);
+    return res.status(500).json(`{Error: ${error}}`);
+  }
+});
+
+app.put("/reset-payment-status", async (req, res) => {
+  const date = new Date();
+  const day = date.getDate();
+
+  if (day === 5) {
+    await pool.query(`
+        UPDATE clients.academy_clients
+        set monthly_payment_status = 'pending'
+      `);
+
+    return res.send("Status atualizado");
+  }
+
+  return res.send("Status não atualizado");
 });
 
 app.get("/getAllProducts", async (req, res) => {
