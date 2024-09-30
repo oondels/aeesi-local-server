@@ -88,8 +88,8 @@
 
 <script>
 import axios from "axios";
-import ip from "../../ip";
 import Alert from "../../components/Alert.vue";
+import ip from "../../ip";
 
 export default {
   name: "CompraItems",

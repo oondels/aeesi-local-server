@@ -29,7 +29,7 @@
           </tr>
         </thead>
 
-        <tbody>
+        <tbody v-if="clientsFiltered">
           <v-dialog max-width="800">
             <template v-slot:activator="{ props: activatorProps }">
               <tr
@@ -69,7 +69,7 @@
                             <th>Ação</th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="clientHistory">
                           <tr
                             v-for="history in clientHistory"
                             :key="history.id"
@@ -105,6 +105,16 @@
                             </td>
                           </tr>
                         </tbody>
+
+                        <div v-else class="loading-data">
+                          <v-progress-circular
+                            a
+                            indeterminate
+                            color="success"
+                            :size="150"
+                            width="18"
+                          ></v-progress-circular>
+                        </div>
                       </table>
                     </div>
                   </div>
@@ -119,6 +129,16 @@
             </template>
           </v-dialog>
         </tbody>
+
+        <div v-else class="loading-data">
+          <v-progress-circular
+            a
+            indeterminate
+            color="success"
+            :size="150"
+            width="18"
+          ></v-progress-circular>
+        </div>
       </table>
     </div>
   </div>
@@ -323,6 +343,12 @@ export default {
 
 .content-table tbody tr:last-of-type {
   border-bottom: 2px solid #009879;
+}
+
+.loading-data {
+  position: fixed;
+  left: 50%;
+  top: 50%;
 }
 
 /* Tabela */

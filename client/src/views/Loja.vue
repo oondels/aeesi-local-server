@@ -26,8 +26,17 @@
       ></v-text-field> -->
     </div>
 
-    <div class="products-list">
+    <div v-if="loadingProducts" class="products-list">
       <CompraItems v-for="item in allProducts" :key="item.id" :product="item" />
+    </div>
+
+    <div v-else class="loading-data">
+      <v-progress-circular
+        indeterminate
+        color="success"
+        :size="150"
+        width="18"
+      ></v-progress-circular>
     </div>
   </div>
 </template>
@@ -50,12 +59,16 @@ export default {
     return {
       allProducts: {},
       barCode: null,
+
+      loadingProducts: false,
     };
   },
 
   mounted() {
     this.getAllProducts();
-    console.log(ip);
+    setTimeout(() => {
+      this.loadingProducts = true;
+    }, 1500);
   },
 
   methods: {

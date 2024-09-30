@@ -2,7 +2,7 @@
   <v-dialog v-model="dialogShown" max-width="400">
     <v-card :color="corAlerta" dark>
       <v-card-title class="headline">
-        <i class="material-icons-round opacity-10 fs-4">{{ iconeAlerta }}</i>
+        <i class="material-icons-round">{{ iconeAlerta }}</i>
         {{ tituloAlerta }}
       </v-card-title>
       <v-card-text>
@@ -45,3 +45,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+i {
+  color: #fff !important;
+}
+</style>

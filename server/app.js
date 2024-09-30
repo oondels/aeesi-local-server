@@ -79,6 +79,26 @@ app.get("/get-academy-clients", async (req, res) => {
   }
 });
 
+app.get("/get-client-relationship", async (req, res) => {
+  try {
+    const query = await pool.query(`
+      SELECT 
+        COUNT(*), course
+      FROM
+        clients.academy_clients
+      GROUP BY
+        course
+      ORDER BY
+       course
+      `);
+
+    res.status(200).json(query.rows);
+  } catch (error) {
+    console.error("Erro ao consultar banco de dados: ", error);
+    return res.status(500).send("Erro interno no Servidor");
+  }
+});
+
 app.get("/get-client-payment-history/:id", async (req, res) => {
   try {
     const clientId = req.params.id;
@@ -126,7 +146,34 @@ app.get("/get-client-payment-history/:id", async (req, res) => {
     return res.status(200).json(paymentDetail);
   } catch (error) {
     console.error("Erro ao consultar banco de dados: ", error);
-    return res.status(500).json(`{Error: ${error}}`);
+    return res.status(500).send("Errro interno no servidor");
+  }
+});
+
+app.get("/get-last-payments", async (req, res) => {
+  try {
+    const query = await pool.query(`
+        SELECT
+          to_char(p.payment_date, 'DD-MM-YYYY') AS payment_date, 
+          p.amount,
+          c.name
+        FROM 
+          clients.academy_clients c
+        INNER JOIN
+          clients.payment p
+        ON
+          p.id_client = c.id
+        WHERE
+          p.payment_status = true
+        ORDER BY
+          p.payment_date
+        LIMIT 5
+      `);
+
+    return res.status(200).json(query.rows);
+  } catch (error) {
+    console.error("Erro ao consultar banco de dados: ", error);
+    return res.status(500).send("Errro interno no servidor");
   }
 });
 
