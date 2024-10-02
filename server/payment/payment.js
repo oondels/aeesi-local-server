@@ -73,7 +73,7 @@ module.exports = function (io) {
       const paymentData = req.body;
 
       if (
-        paymentData.action === "paymenapprovedt.created" ||
+        paymentData.action === "payment.created" ||
         paymentData.action === "payment.updated"
       ) {
         console.log("Novo pagamento registrado: ", paymentData.data.id);
@@ -83,19 +83,21 @@ module.exports = function (io) {
         const paymentDetail = await payment.get({ id: paymentId });
 
         if (paymentDetail.status === "approved") {
-          await pool.query(
-            `
-          UPDATE loja.sales
-          SET 
-            sale_status = $1, updated_at = NOW()
-          WHERE 
-            payment_id = $2
-          `,
-            [paymentDetail.status, paymentId]
-          );
+          console.log("Pagamento aprovado");
+          // await pool.query(
+          //   `
+          //   UPDATE clients.payment
+          //   SET
+          //     payment_status = $1, updated_at = NOW()
+          //   WHERE
+          //     payment_id = $2
+          //   `,
+          //   [paymentDetail.status, paymentId]
+          // );
+          // Socket.emit("paymentResult", paymentDetail.status); -> Configurar web socket para enviar ao cliente o resultado
         }
 
-        res.status(200).send("Webhook processado com sucesso.");
+        res.status(200).send("Pagamento Processado com sucesso.");
       } else {
         console.log("Ação não tratada: ", paymentData.action);
 
