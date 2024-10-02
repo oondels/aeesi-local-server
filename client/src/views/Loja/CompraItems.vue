@@ -38,17 +38,19 @@
                   <v-btn @click="checkPaymentStatus(product.id)">
                     Verificar pagamento
                   </v-btn>
-                  <h4 :class="paymentStatus === 'paid' ? 'pago' : 'pendente'">
+                  <h4
+                    :class="paymentStatus === 'approved' ? 'pago' : 'pendente'"
+                  >
                     <i
                       :class="
-                        paymentStatus === 'paid'
+                        paymentStatus === 'approved'
                           ? 'material-symbols-outlined'
                           : 'material-symbols-outlined'
                       "
                     >
-                      {{ paymentStatus === "paid" ? "paid" : "pending" }}
+                      {{ paymentStatus === "approved" ? "paid" : "pending" }}
                     </i>
-                    {{ paymentStatus === "paid" ? "Pago!" : "Pendente" }}
+                    {{ paymentStatus === "approved" ? "Pago!" : "Pendente" }}
                   </h4>
                 </div>
 
@@ -81,14 +83,18 @@
       </v-card-actions>
     </v-card>
   </div>
+  <alert ref="alert" />
 </template>
 
 <script>
 import axios from "axios";
+import Alert from "../../components/Alert.vue";
 import ip from "../../ip";
 
 export default {
   name: "CompraItems",
+
+  components: { Alert },
 
   props: {
     product: {
@@ -110,36 +116,38 @@ export default {
 
   methods: {
     buyProduct(id, name, amount) {
-      console.log(id, name, amount);
       const paymentData = {
         transaction_amount: amount,
         description: `Compra de ${name}`,
         payment_method_id: "pix",
-        email: "email@gmail.com",
+        email: "hendriusfelix@gmail.com",
         identification: "cpf",
         identificationValue: "04894714558",
         productId: id,
         productName: name,
       };
-      console.log(ip);
-      console.log(paymentData);
+
       axios
         .post(`${ip}/payment/pix-payment`, {
-          data: {
-            paymentData: paymentData,
-          },
+          paymentData,
         })
         .then((response) => {
           this.loading = false;
 
-          console.log(response.data);
-          this.paymentInfo = response.data.id;
+          this.paymentInfo = response.data.data.id;
           this.qrCode =
-            response.data.point_of_interaction.transaction_data.ticket_url;
+            response.data.data.point_of_interaction.transaction_data.ticket_url;
 
           setTimeout(() => {
             this.checkPayment = true;
           }, 500);
+
+          return this.$refs.alert.mostrarAlerta(
+            "success",
+            "done_outline",
+            "Sucesso",
+            response.data.message
+          );
         })
         .catch((error) => {
           console.error("Erro interno no servidor: ", error);
@@ -155,7 +163,21 @@ export default {
           },
         })
         .then((response) => {
-          this.paymentStatus = response.data;
+          this.paymentStatus = response.data.status;
+
+          if (response.data.status === "approved") {
+            this.$refs.alert.mostrarAlerta(
+              "success",
+              "done_outline",
+              "Sucesso",
+              "Pagamento Pago com Sucesso"
+            );
+
+            setTimeout(() => {
+              this.checkPayment = false;
+              this.qrCode = null;
+            }, 1500);
+          }
         })
         .catch((error) => {
           console.error("Erro ao consultar status de pagamento: ", error);

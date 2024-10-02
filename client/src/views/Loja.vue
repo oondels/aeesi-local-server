@@ -15,22 +15,29 @@
     class="main d-flex justify-content-center flex-column align-items-center"
   >
     <div class="bipar-product">
-      <h3>Compre Rapidamente</h3>
-      <v-text-field
+      <!-- <h3>Compre Rapidamente</h3> -->
+
+      <CadastroItems />
+
+      <!-- <v-text-field
         v-model="barCode"
         type="number"
         label="Bipar"
         @keyup="buyProduct"
-      ></v-text-field>
+      ></v-text-field> -->
     </div>
 
-    <div class="products-list">
-      <CompraItems
-        :class="'product-' + item.id"
-        v-for="item in allProducts"
-        :key="item.id"
-        :product="item"
-      />
+    <div v-if="loadingProducts" class="products-list">
+      <CompraItems v-for="item in allProducts" :key="item.id" :product="item" />
+    </div>
+
+    <div v-else class="loading-data">
+      <v-progress-circular
+        indeterminate
+        color="success"
+        :size="150"
+        width="18"
+      ></v-progress-circular>
     </div>
   </div>
 </template>
@@ -53,11 +60,16 @@ export default {
     return {
       allProducts: {},
       barCode: null,
+
+      loadingProducts: false,
     };
   },
 
   mounted() {
     this.getAllProducts();
+    setTimeout(() => {
+      this.loadingProducts = true;
+    }, 1500);
   },
 
   methods: {

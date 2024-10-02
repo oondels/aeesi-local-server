@@ -5,16 +5,19 @@
         menu
       </i>
       <div :class="menu ? 'show' : 'hidden'" id="menu-links">
-        <router-link class="apps" to="/" exact-active-class="active"
-          >Apps</router-link
-        >
-        <router-link to="/academy_clients" exact-active-class="active"
-          >Clientes</router-link
-        >
-        <router-link to="/register" exact-active-class="active"
-          >Cadastro</router-link
-        >
+        <router-link class="apps" to="/" exact-active-class="active">
+          Apps
+        </router-link>
+        <router-link to="/academy_clients" exact-active-class="active">
+          Clientes
+        </router-link>
+        <router-link to="/register" exact-active-class="active">
+          Cadastro
+        </router-link>
         <router-link to="/loja" exact-active-class="active">Loja</router-link>
+        <router-link to="/dashboard" exact-active-class="active">
+          Dashboard
+        </router-link>
       </div>
     </nav>
     <router-view />
