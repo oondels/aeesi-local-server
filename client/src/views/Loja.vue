@@ -2,7 +2,8 @@
   <div
     class="header d-flex justify-content-center flex-column align-items-center"
   >
-    <div>
+    <div class="title-search">
+      <CadastroItems />
       <h1 class="text-center">Loja AEESI</h1>
       <div class="search">
         <input placeholder="Pesquisar" />
