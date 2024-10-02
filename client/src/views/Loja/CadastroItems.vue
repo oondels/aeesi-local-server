@@ -1,12 +1,13 @@
 <template>
   <v-dialog max-width="500">
     <template v-slot:activator="{ props: activatorProps }">
-      <v-btn
+      <i
+        role="button"
         v-bind="activatorProps"
-        color="surface-variant"
-        text="Cadastro de Produtos"
-        variant="flat"
-      ></v-btn>
+        class="register-item material-symbols-outlined"
+      >
+        add_shopping_cart
+      </i>
     </template>
 
     <template v-slot:default="{ isActive }">
@@ -114,7 +115,7 @@ export default {
       }
 
       axios
-        .post(`http://${ip}:2399/registerItem`, this.newItem)
+        .post(`${ip}/registerItem`, this.newItem)
         .then((response) => {
           console.log(response.data);
         })
@@ -137,4 +138,18 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.register-item {
+  background-color: #61cf21;
+  padding: 10px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 25px;
+  transition: all ease-in-out 0.2s;
+}
+
+.register-item:hover {
+  background-color: rgb(90, 194, 30);
+  transform: scale(1.03);
+}
+</style>

@@ -124,7 +124,7 @@ export default {
       console.log(ip);
       console.log(paymentData);
       axios
-        .post(`http://${ip}:2399/payment/pix-payment`, {
+        .post(`${ip}/payment/pix-payment`, {
           data: {
             paymentData: paymentData,
           },
@@ -148,7 +148,7 @@ export default {
 
     checkPaymentStatus(id) {
       axios
-        .get(`http://${ip}:2399/payment/checkPaymentStatus`, {
+        .get(`${ip}/payment/checkPaymentStatus`, {
           params: {
             paymentId: this.paymentInfo,
             productId: id,

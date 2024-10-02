@@ -113,7 +113,7 @@ export default {
       }
 
       axios
-        .post(`http://${ip}:2399/registerItem`, this.newItem)
+        .post(`${ip}/registerItem`, this.newItem)
         .then((response) => {
           console.log(response.data);
         })

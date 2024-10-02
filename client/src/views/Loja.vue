@@ -2,7 +2,8 @@
   <div
     class="header d-flex justify-content-center flex-column align-items-center"
   >
-    <div>
+    <div class="title-search">
+      <CadastroItems />
       <h1 class="text-center">Loja AEESI</h1>
       <div class="search">
         <input placeholder="Pesquisar" />
@@ -62,7 +63,7 @@ export default {
   methods: {
     getAllProducts() {
       axios
-        .get(`http://${ip}:2399/getAllProducts`)
+        .get(`${ip}/getAllProducts`)
         .then((response) => {
           this.allProducts = response.data;
         })
@@ -82,7 +83,7 @@ export default {
 
       if (this.barCode) {
         axios
-          .post(`http://${ip}:2399/payment/pix-payment-barcode`, {
+          .post(`${ip}/payment/pix-payment-barcode`, {
             data: {
               paymentData: paymentData,
             },

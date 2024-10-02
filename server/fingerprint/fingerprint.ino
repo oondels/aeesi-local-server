@@ -5,7 +5,7 @@
 
 #define SSID "Drogo"
 #define PASS "75982466703"
-#define SERVER_URL "http://192.168.1.8:2399/get-fingerprint"
+#define SERVER_URL "http://192.168.1.8/get-fingerprint"
 
 HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
