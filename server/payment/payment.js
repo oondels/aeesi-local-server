@@ -73,7 +73,7 @@ module.exports = function (io) {
       const paymentData = req.body;
 
       if (
-        paymentData.action === "paymenapprovedt.created" ||
+        paymentData.action === "payment.created" ||
         paymentData.action === "payment.updated"
       ) {
         console.log("Novo pagamento registrado: ", paymentData.data.id);
