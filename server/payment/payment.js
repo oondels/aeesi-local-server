@@ -108,7 +108,6 @@ module.exports = function (io) {
           //   `,
           //   [paymentDetail.status, paymentId]
           // );
-          // Socket.emit("paymentResult", paymentDetail.status); -> Configurar web socket para enviar ao cliente o resultado
         }
 
         res.status(200).send("Pagamento Processado com sucesso.");
@@ -174,103 +173,6 @@ module.exports = function (io) {
       } else {
         res.status(400).json({ message: "Erro na criação do pagamento." });
       }
-    } catch (error) {
-      console.error("Erro interno no servidor: ", error);
-      res.status(500).send("Erro interno no servidor.");
-    }
-  });
-
-  router.post("/client-monthly-payment", async (req, res) => {
-    try {
-      const { client, price, method } = req.body;
-
-      const requestOptions = {
-        idempotencyKey: uuidv4(),
-      };
-
-      const body = {
-        transaction_amount: parseFloat(price),
-        description: "Pagamento de mensalidade",
-        payment_method_id: method,
-        notification_url:
-          "https://aeesi-local-server.vercel.app/payment/web-hooks",
-        payer: {
-          email: client.email,
-          identification: {
-            type: "cpf",
-            number: client.cpf,
-          },
-        },
-      };
-
-      const response = await payment.create({ body, requestOptions });
-
-      if (response && response.status === "pending") {
-        const paymentId = response.id;
-        const paymentStatus = response.status;
-
-        await pool.query(
-          `
-        INSERT INTO clients.payment (nome, id_client, payment_id, payment_status, created_at)
-        VALUES ($1, $2, $3, $4, NOW())
-        `,
-          [client.name, client.id, paymentId, paymentStatus]
-        );
-
-        res.status(200).send("Pagamento em processamento...");
-      } else {
-        res.status(400).send("Erro na criação do pagamento.");
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Erro interno no servidor!");
-    }
-  });
-
-  router.post("/pix-payment-barcode", async (req, res) => {
-    try {
-      const paymentDetails = req.body.data;
-
-      const requestOptions = {
-        idempotencyKey: uuidv4(),
-      };
-
-      const query = await pool.query(
-        `
-        SELECT selling_price, name FROM loja.items_loja
-        WHERE
-          barcode = $1
-      `,
-        [paymentDetails.paymentData.barCode]
-      );
-
-      const product = query.rows;
-
-      if (product.length === 0) {
-        return res.status(404).send("Produto não encontrado.");
-      }
-
-      body = {
-        transaction_amount: parseFloat(product[0].selling_price),
-        description: `Compra de ${product[0].name}`,
-        payment_method_id: paymentDetails.paymentData.payment_method_id,
-        payer: {
-          email: process.env.DEFAULT_EMAIL,
-          identification: {
-            type: paymentDetails.paymentData.identification,
-            number: paymentDetails.paymentData.identificationValue,
-          },
-        },
-      };
-
-      payment
-        .create({ body, requestOptions })
-        .then((response) => {
-          res.status(200).send(response);
-        })
-        .catch((error) => {
-          console.error("Erro:", error);
-        });
     } catch (error) {
       console.error("Erro interno no servidor: ", error);
       res.status(500).send("Erro interno no servidor.");
