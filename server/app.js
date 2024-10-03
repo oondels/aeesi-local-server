@@ -4,20 +4,32 @@ const pool = require("./db/db.js");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
-const payment = require("./payment/payment.js");
+const { Server } = require("socket.io");
+const paymentRoutes = require("./payment/payment.js");
 
 const app = express();
 const port = 2399;
 
 const server = http.createServer(app);
 
-const io = require("socket.io")(server, {
+const io = new Server(server, {
   cors: {
     origin: "*",
   },
 });
 
-const paymentRoutes = require("./payment/payment.js")(io);
+io.on("connection", (socket) => {
+  console.log("Novo cliente conectado:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado:", socket.id);
+  });
+});
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 app.use(cors());
 app.use(express.json());

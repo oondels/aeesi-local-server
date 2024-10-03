@@ -85,20 +85,27 @@ module.exports = function (io) {
         if (paymentDetail.status === "approved") {
           await pool.query(
             `
-          UPDATE loja.sales
-          SET 
-            sale_status = $1, updated_at = NOW()
-          WHERE 
-            payment_id = $2
-          `,
+            UPDATE clients.payment
+            SET
+              payment_status = $1, updated_at = NOW()
+            WHERE
+              payment_id = $2
+            `,
             [paymentDetail.status, paymentId]
           );
+
+          req.io.emit("payment-approved", {
+            status: "approved",
+          });
         }
 
-        res.status(200).send("Webhook processado com sucesso.");
+        res.status(200).send("Pagamento Processado com sucesso.");
       } else {
         console.log("Ação não tratada: ", paymentData.action);
 
+        req.io.emit("payment-not-approved", {
+          status: "error",
+        });
         res.status(400).send("Ação não tratada.");
       }
     } catch (error) {
@@ -158,6 +165,53 @@ module.exports = function (io) {
     } catch (error) {
       console.error("Erro interno no servidor: ", error);
       res.status(500).send("Erro interno no servidor.");
+    }
+  });
+
+  router.post("/client-monthly-payment", async (req, res) => {
+    try {
+      const { client, price, method } = req.body;
+
+      const requestOptions = {
+        idempotencyKey: uuidv4(),
+      };
+
+      const body = {
+        transaction_amount: parseFloat(price),
+        description: "Pagamento de mensalidade",
+        payment_method_id: method,
+        notification_url:
+          "https://aeesi-local-server.vercel.app/payment/web-hooks",
+        payer: {
+          email: client.email,
+          identification: {
+            type: "cpf",
+            number: client.cpf,
+          },
+        },
+      };
+
+      const response = await payment.create({ body, requestOptions });
+
+      if (response && response.status === "pending") {
+        const paymentId = response.id;
+        const paymentStatus = response.status;
+
+        await pool.query(
+          `
+        INSERT INTO clients.payment (nome, id_client, payment_id, payment_status, created_at)
+        VALUES ($1, $2, $3, $4, NOW())
+        `,
+          [client.name, client.id, paymentId, paymentStatus]
+        );
+
+        res.status(200).send("Pagamento em processamento...");
+      } else {
+        res.status(400).send("Erro na criação do pagamento.");
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Erro interno no servidor!");
     }
   });
 
