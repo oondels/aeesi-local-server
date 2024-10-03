@@ -97,6 +97,18 @@ module.exports = function (io) {
           req.io.emit("payment-approved", {
             status: "approved",
           });
+          console.log("Pagamento aprovado");
+          // await pool.query(
+          //   `
+          //   UPDATE clients.payment
+          //   SET
+          //     payment_status = $1, updated_at = NOW()
+          //   WHERE
+          //     payment_id = $2
+          //   `,
+          //   [paymentDetail.status, paymentId]
+          // );
+          // Socket.emit("paymentResult", paymentDetail.status); -> Configurar web socket para enviar ao cliente o resultado
         }
 
         res.status(200).send("Pagamento Processado com sucesso.");
