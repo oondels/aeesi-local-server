@@ -127,6 +127,8 @@ export default {
         productName: name,
       };
 
+      console.log(paymentData);
+
       axios
         .post(`${ip}/payment/pix-payment`, {
           paymentData,

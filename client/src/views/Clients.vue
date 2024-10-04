@@ -89,19 +89,56 @@
                               </span>
                             </td>
                             <td>
-                              <v-btn
-                                v-if="!history.payment_status"
-                                @click="
-                                  registerPayment(
-                                    history.client_id,
-                                    history.mes_pagamento
-                                  )
-                                "
-                                color="success"
-                                variant="outlined"
-                              >
-                                Registrar Pagamento
-                              </v-btn>
+                              <v-dialog max-width="500">
+                                <template
+                                  v-slot:activator="{ props: activatorProps }"
+                                >
+                                  <v-btn
+                                    v-bind="activatorProps"
+                                    color="success"
+                                    text="Registrar Pagamento"
+                                    variant="outlined"
+                                  ></v-btn>
+                                </template>
+
+                                <template v-slot:default="{ isActive }">
+                                  <v-card title="Dialog">
+                                    <v-card-text>
+                                      <p>
+                                        Coloque o valor que deseja registrar
+                                      </p>
+                                      <v-text-field
+                                        v-model="paymentValueRegister"
+                                        label="Valor"
+                                      />
+                                    </v-card-text>
+
+                                    <v-card-actions>
+                                      <v-spacer></v-spacer>
+
+                                      <v-btn
+                                        text="Fechar"
+                                        @click="isActive.value = false"
+                                      ></v-btn>
+
+                                      <v-btn
+                                        v-if="!history.payment_status"
+                                        @click="
+                                          registerPayment(
+                                            history.client_id,
+                                            history.mes_pagamento,
+                                            paymentValueRegister
+                                          )
+                                        "
+                                        color="success"
+                                        variant="outlined"
+                                      >
+                                        Pagar
+                                      </v-btn>
+                                    </v-card-actions>
+                                  </v-card>
+                                </template>
+                              </v-dialog>
                             </td>
                           </tr>
                         </tbody>
@@ -164,6 +201,8 @@ export default {
       selectedClient: "",
       selectedCourse: "",
 
+      paymentValueRegister: null,
+
       clientHistory: null,
 
       courses: [],
@@ -208,12 +247,13 @@ export default {
         });
     },
 
-    registerPayment(clientId, month) {
-      console.log(clientId, month);
+    registerPayment(clientId, month, value) {
+      console.log(clientId, month, value);
       axios
-        .post(`${ip}/register-payment`, {
+        .post(`${ip}/payment/register-payment`, {
           clientId,
           month,
+          value,
         })
         .then((response) => {
           this.$refs.alert.mostrarAlerta(

@@ -179,36 +179,13 @@ app.get("/get-last-payments", async (req, res) => {
           p.payment_status = true
         ORDER BY
           p.payment_date
-        LIMIT 5
+        LIMIT 10
       `);
 
     return res.status(200).json(query.rows);
   } catch (error) {
     console.error("Erro ao consultar banco de dados: ", error);
     return res.status(500).send("Errro interno no servidor");
-  }
-});
-
-app.post("/register-payment", async (req, res) => {
-  try {
-    const { clientId, month } = req.body;
-    const currentDate = new Date();
-
-    let date = `2024-`;
-    date += month + "-" + currentDate.getDate();
-
-    const query = await pool.query(
-      `
-      INSERT INTO clients.payment (id_client, payment_status, payment_date, create_date, update_date)
-      VALUES ($1, true, $2, NOW(), NOW())
-    `,
-      [clientId, date]
-    );
-
-    return res.status(200).send("Pagamento registrado com sucesso!");
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send("Erro interno no servidor");
   }
 });
 
