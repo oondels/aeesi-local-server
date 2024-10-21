@@ -14,10 +14,10 @@
         <router-link to="/register" exact-active-class="active">
           Cadastro
         </router-link>
-        <!-- <router-link to="/loja" exact-active-class="active">Loja</router-link> -->
-        <router-link to="/dashboard" exact-active-class="active">
+        <router-link to="/loja" exact-active-class="active">Loja</router-link>
+        <!-- <router-link to="/dashboard" exact-active-class="active">
           Dashboard
-        </router-link>
+        </router-link> -->
       </div>
     </nav>
     <router-view />

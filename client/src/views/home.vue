@@ -16,13 +16,13 @@
         </div>
       </router-link>
 
-      <!-- <router-link to="/loja">
+      <router-link to="/loja">
         <div class="m-3 card-app">
           <h4>Loja</h4>
           <p>Explore nosso catálogo de produtos.</p>
           <img src="/img/aplications/store.png" alt="Loja" />
         </div>
-      </router-link> -->
+      </router-link>
     </div>
   </div>
 </template>

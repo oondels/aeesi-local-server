@@ -127,8 +127,6 @@ export default {
         productName: name,
       };
 
-      console.log(paymentData);
-
       axios
         .post(`${ip}/payment/pix-payment`, {
           paymentData,
@@ -143,13 +141,6 @@ export default {
           setTimeout(() => {
             this.checkPayment = true;
           }, 500);
-
-          return this.$refs.alert.mostrarAlerta(
-            "success",
-            "done_outline",
-            "Sucesso",
-            response.data.message
-          );
         })
         .catch((error) => {
           console.error("Erro interno no servidor: ", error);
