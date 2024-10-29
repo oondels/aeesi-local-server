@@ -96,17 +96,6 @@ router.post("/web-hooks", async (req, res) => {
         req.io.emit("payment-approved", {
           status: "approved",
         });
-        console.log("Pagamento aprovado");
-        // await pool.query(
-        //   `
-        //   UPDATE clients.payment
-        //   SET
-        //     payment_status = $1, updated_at = NOW()
-        //   WHERE
-        //     payment_id = $2
-        //   `,
-        //   [paymentDetail.status, paymentId]
-        // );
       }
 
       res.status(200).send("Pagamento Processado com sucesso.");
@@ -194,6 +183,77 @@ router.post("/pix-payment", async (req, res) => {
       });
     } else {
       res.status(400).json({ message: "Erro na criação do pagamento." });
+    }
+  } catch (error) {
+    console.error("Erro interno no servidor: ", error);
+    res.status(500).send("Erro interno no servidor.");
+  }
+});
+
+router.post("/client-monthly-payment", async (req, res) => {
+  try {
+    const client = req.body;
+
+    const date = new Date();
+    const currentYear = date.getFullYear();
+
+    const clientBirth = new Date(client.birth);
+    const clientAge = currentYear - clientBirth.getFullYear();
+
+    const query = await pool.query(
+      `
+        SELECT price FROM courses.courses
+        WHERE name = $1
+      `,
+      [client.course]
+    );
+    let price = query.rows[0].price;
+
+    if (clientAge <= 15 && client.course === "Jiu-Jitsu") {
+      price = price - 20;
+    }
+
+    // // Lógica de valor aleatório
+    const requestOptions = {
+      idempotencyKey: uuidv4(),
+    };
+
+    const body = {
+      transaction_amount: 0.2,
+      description: `Pagamento de Mensalidade de ${client.course}`,
+      payment_method_id: "pix",
+      notification_url:
+        "https://aeesi-local-server.vercel.app/payment/web-hooks",
+      payer: {
+        email: client.email,
+        identification: {
+          type: "cpf",
+          number: client.cpf,
+        },
+      },
+    };
+
+    const response = await payment.create({ body, requestOptions });
+
+    if (response && response.status === "pending") {
+      const paymentId = response.id;
+      const paymentStatus = response.status;
+
+      req.io.emit("payment-approved", {
+        status: "approved",
+      });
+
+      await pool.query(
+        `
+        INSERT INTO clients.payment (id_client, payment_id, payment_status, created_at)
+        VALUES ($1, $2, false, NOW())
+      `,
+        [client.id, paymentId]
+      );
+
+      res.status(200).send("Pagamento em processamento...");
+    } else {
+      res.status(400).send("Erro na criação do pagamento.");
     }
   } catch (error) {
     console.error("Erro interno no servidor: ", error);
