@@ -220,6 +220,56 @@ app.get("/getAllProducts", async (req, res) => {
   }
 });
 
+app.get("/get-all-courses", async (req, res) => {
+  try {
+    const courses = await pool.query(`SELECT * FROM courses.courses`);
+    res.status(200).json(courses.rows);
+  } catch (error) {
+    res.status(500).send("Erro ao buscar cursos disponíveis.");
+    console.error("Erro ao buscar cursos: ", error);
+  }
+});
+
+app.get("/check-monthly-payment-status/:id", async (req, res) => {
+  try {
+    const clientId = req.params.id;
+
+    const query = await pool.query(
+      `
+        SELECT ac.id, ac.name, ac.monthly_payment_status, p.payment_status, p.id_client, p.payment_date
+        FROM
+          clients.academy_clients ac
+        LEFT JOIN
+          clients.payment p ON ac.id = p.id_client
+        WHERE ac.id = $1
+          AND EXTRACT(YEAR FROM p.payment_date) = EXTRACT(YEAR FROM NOW()) 
+          AND EXTRACT(MONTH FROM p.payment_date) = EXTRACT(MONTH FROM NOW())
+      `,
+      [clientId]
+    );
+    const payment = query.rows[0];
+
+    if (payment && payment.payment_status === true) {
+      await pool.query(
+        `
+          UPDATE clients.academy_clients
+          SET 
+            monthly_payment_status = 'approved'
+          WHERE
+            id = $1`,
+        [clientId]
+      );
+
+      return res.status(200).json({ payment: true });
+    }
+
+    return res.status(200).json({ payment: false });
+  } catch (error) {
+    console.error("Erro ao verificar status de pagamento: ", error);
+    res.status(500).send("Erro ao verificar status de pagamento: ", error);
+  }
+});
+
 app.post("/register-item", async (req, res) => {
   try {
     const newItem = req.body;
